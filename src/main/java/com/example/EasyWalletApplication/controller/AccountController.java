@@ -1,8 +1,6 @@
 package com.example.EasyWalletApplication.controller;
 
-import com.example.EasyWalletApplication.dto.request.CreateAccountRequest;
-import com.example.EasyWalletApplication.dto.request.FundWalletRequest;
-import com.example.EasyWalletApplication.dto.request.PerformTransactionRequest;
+import com.example.EasyWalletApplication.dto.request.*;
 import com.example.EasyWalletApplication.dto.response.ApiResponse;
 import com.example.EasyWalletApplication.exceptions.InvalidTransaction;
 import com.example.EasyWalletApplication.services.WalletService;
@@ -40,23 +38,26 @@ public class AccountController {
         }
     }
 
-    @PostMapping("fund_wallet")
-    public ResponseEntity<ApiResponse<?>> fundWallet(@RequestBody FundWalletRequest request){
-        System.out.println(request);
+    @PostMapping("fund_wallet/paystack")
+    public ResponseEntity<ApiResponse<?>> fundWallet(@RequestBody PayStackFundWalletRequest request){
         try{
-            walletService.fundWallet(request);
+            walletService.fundWallet(new FundWalletRequest(request));
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (InvalidTransaction e) {
             return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), false));
         }
     }
 
+    @PostMapping("fund_wallet/monnify")
+    public ResponseEntity<ApiResponse<?>> fundWallet(@RequestBody MonnifyFundWalletRequest request){
+        try{
+            walletService.fundWallet(new FundWalletRequest(request));
+            return new ResponseEntity<>(HttpStatus.OK);
+        }catch (InvalidTransaction exception){
+            return ResponseEntity.badRequest().body(new ApiResponse<>(exception.getMessage(), false));
+        }
 
-
-
-
-
-
+    }
 
 
 }

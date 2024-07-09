@@ -2,12 +2,20 @@ package com.example.EasyWalletApplication.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
 public class FundWalletRequest {
-    private PayStackData data;
-    private String event;
+    private String status;
+    private String reference;
+
+    public FundWalletRequest(PayStackFundWalletRequest request){
+        this.status = request.getEvent();
+        this.reference = request.getData().getReference();
+    }
+
+    public FundWalletRequest(MonnifyFundWalletRequest request) {
+        this.status = request.getEventType();
+        this.reference = request.getEventData().getPaymentReference();
+    }
 }

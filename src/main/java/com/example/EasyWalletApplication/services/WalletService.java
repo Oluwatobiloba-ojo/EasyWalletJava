@@ -2,6 +2,7 @@ package com.example.EasyWalletApplication.services;
 
 import com.example.EasyWalletApplication.dto.request.CreateAccountRequest;
 import com.example.EasyWalletApplication.dto.request.FundWalletRequest;
+import com.example.EasyWalletApplication.dto.request.PayStackFundWalletRequest;
 import com.example.EasyWalletApplication.dto.request.PerformTransactionRequest;
 import com.example.EasyWalletApplication.dto.response.CreateWalletResponse;
 import com.example.EasyWalletApplication.dto.response.PerformTransactionResponse;
@@ -11,7 +12,6 @@ import com.example.EasyWalletApplication.exceptions.AccountAlreadyExist;
 import com.example.EasyWalletApplication.exceptions.InvalidTransaction;
 
 import java.util.List;
-import java.util.Map;
 
 public interface WalletService {
 

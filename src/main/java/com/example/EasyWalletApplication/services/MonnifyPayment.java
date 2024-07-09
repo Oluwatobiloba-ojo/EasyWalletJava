@@ -21,8 +21,6 @@ public class MonnifyPayment implements PaymentService {
         String secret = beanConfig.getMonnifyApiKey()+":"+beanConfig.getMonnifySecretKey();
         String key = "Basic "+ Base64.getEncoder().encodeToString(secret.getBytes());
         ResponseEntity<MonnifyResponse> response = External.makeCall(key, request.getData(), beanConfig.getMonnifyUrl(), MonnifyResponse.class);
-        System.out.println(response);
-        System.out.println(response.getBody());
         if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null){
             initializePaymentResponse.setStatus(false);
         }else {

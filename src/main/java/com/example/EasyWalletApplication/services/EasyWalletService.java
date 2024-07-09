@@ -78,36 +78,46 @@ public class EasyWalletService implements WalletService {
     @Override
     public PerformTransactionResponse performTransaction(PerformTransactionRequest request) throws AccountAlreadyExist, InvalidTransaction {
         Account account = findAccount(request.getAccount_number());
-        PerformTransactionResponse response = new PerformTransactionResponse();
+        boolean isAmountInValid = request.getAmount().compareTo(BigDecimal.valueOf(20)) < 0;
+        if (isAmountInValid) throw new InvalidTransaction(AMOUNT_LESS_THAN_FIVE);
         request.setPayment_means(request.getPayment_means().toUpperCase());
         if (!request.getPayment_means().equals(MONNIFY) && !request.getPayment_means().equals(ApiUtil.PAYSTACK)) throw new InvalidTransaction(TRANSACTION_MEANS_NOT_EXIST);
+        PerformTransactionResponse response = new PerformTransactionResponse();
         CreateTransactionResponse transactionResponse = transactionService.createTransaction(new CreateTransactionRequest(request, account));
         if (request.getPayment_means().equals(ApiUtil.PAYSTACK)){
-            request.setAmount(request.getAmount().multiply(BigDecimal.valueOf(100)));
-            InitializePayment<PaystackInitializePayment> initializePayment = new InitializePayment<>();
-            initializePayment.setData(createPayStackRequest(request.getAmount(), transactionResponse.getId(), account.getProfile().getEmail()));
-            InitializePaymentResponse initializePaymentResponse = paystackPaymentService.initializeTransaction(initializePayment);
-            response.setUrl(initializePaymentResponse.getUrl());
+            fundPayStackWallet(request, transactionResponse, account, response);
         }else {
-            InitializePayment<MonnifyInitializePayment> monnifyPayment = new InitializePayment<>();
-            monnifyPayment.setData(createMonnifyRequest(request, account.getAccountName(), account.getProfile().getEmail(), transactionResponse.getId()));
-            InitializePaymentResponse initializePaymentResponse = monnifyPaymentService.initializeTransaction(monnifyPayment);
-            response.setUrl(initializePaymentResponse.getUrl());
+            fundMonnifyWallet(request, account, transactionResponse, response);
         }
         response.setMessage(TRANSACTION_SUCCESSFULLY);
         return response;
     }
 
+    private void fundMonnifyWallet(PerformTransactionRequest request, Account account, CreateTransactionResponse transactionResponse, PerformTransactionResponse response) {
+        InitializePayment<MonnifyInitializePayment> monnifyPayment = new InitializePayment<>();
+        monnifyPayment.setData(createMonnifyRequest(request, account.getAccountName(), account.getProfile().getEmail(), transactionResponse.getId()));
+        InitializePaymentResponse initializePaymentResponse = monnifyPaymentService.initializeTransaction(monnifyPayment);
+        response.setUrl(initializePaymentResponse.getUrl());
+    }
+
+    private void fundPayStackWallet(PerformTransactionRequest request, CreateTransactionResponse transactionResponse, Account account, PerformTransactionResponse response) {
+        request.setAmount(request.getAmount().multiply(BigDecimal.valueOf(100)));
+        InitializePayment<PaystackInitializePayment> initializePayment = new InitializePayment<>();
+        initializePayment.setData(createPayStackRequest(request.getAmount(), transactionResponse.getId(), account.getProfile().getEmail()));
+        InitializePaymentResponse initializePaymentResponse = paystackPaymentService.initializeTransaction(initializePayment);
+        response.setUrl(initializePaymentResponse.getUrl());
+    }
+
     @Async
     @Override
     public void fundWallet(FundWalletRequest request) throws InvalidTransaction {
-        if (request.getEvent().equals(PAYSTACK_SUCCESS) || request.getEvent().equals(MONNIFY_SUCCESS)) {
-            Transaction transaction = transactionService.updateTransaction(request.getData().getReference(), Status.SUCCESSFUL);
+        if (request.getStatus().equals(PAYSTACK_SUCCESS) || request.getStatus().equals(MONNIFY_SUCCESS)) {
+            Transaction transaction = transactionService.updateTransaction(request.getReference(), Status.SUCCESSFUL);
             Account account = transaction.getAccount();
             account.setAccountBalance(account.getAccountBalance().add(transaction.getAmount()));
             repository.save(account);
         }else {
-            transactionService.updateTransaction(request.getData().getReference(), Status.FAILED);
+            transactionService.updateTransaction(request.getReference(), Status.FAILED);
         }
     }
 

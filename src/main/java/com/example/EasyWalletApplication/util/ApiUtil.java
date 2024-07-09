@@ -12,4 +12,5 @@ public class ApiUtil {
     public static final String PAYSTACK_SUCCESS = "charge.success";
     public static final String MONNIFY_SUCCESS = "SUCCESSFUL_TRANSACTION";
     public static final String ACCOUNT_DOES_NOT_EXIST = "Account does not exist";
+    public static final String AMOUNT_LESS_THAN_FIVE = "Amount is meant to be greater than 20";
 }

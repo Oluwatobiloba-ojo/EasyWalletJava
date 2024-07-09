@@ -2,6 +2,7 @@ package com.example.EasyWalletApplication.services;
 
 import com.example.EasyWalletApplication.dto.request.CreateAccountRequest;
 import com.example.EasyWalletApplication.dto.request.FundWalletRequest;
+import com.example.EasyWalletApplication.dto.request.PayStackData;
 import com.example.EasyWalletApplication.dto.request.PerformTransactionRequest;
 import com.example.EasyWalletApplication.dto.response.CreateWalletResponse;
 import com.example.EasyWalletApplication.dto.response.PerformTransactionResponse;
@@ -116,8 +117,10 @@ public class WalletServiceTest {
     public void testThatATransactionCanBeUpdatedAndAlsoTheAccountBalanceCanBeUpdatedAlsoIfSuccessful() throws AccountAlreadyExist, InvalidTransaction {
         ProfileResponse profileResponse = walletService.getProfile("08032389457");
         FundWalletRequest request = new FundWalletRequest();
-        request.setReferenceId("e558ab7c-d536-45ac-9209-7c5b43cded7c");
-        request.setStatus("charge.success");
+        PayStackData data = new PayStackData();
+        data.setReference("e558ab7c-d536-45ac-9209-7c5b43cded7c");
+        request.setData(data);
+        request.setEvent("charge.success");
         walletService.fundWallet(request);
         assertThat(walletService.getProfile("08032389457").getAmount()).isGreaterThan(profileResponse.getAmount());
     }

@@ -14,6 +14,7 @@ import com.example.EasyWalletApplication.util.ApiUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -97,15 +98,16 @@ public class EasyWalletService implements WalletService {
         return response;
     }
 
+    @Async
     @Override
     public void fundWallet(FundWalletRequest request) throws InvalidTransaction {
-        if (request.getStatus().equals(PAYSTACK_SUCCESS) || request.getStatus().equals(MONNIFY_SUCCESS)) {
-            Transaction transaction = transactionService.updateTransaction(request.getReferenceId(), Status.SUCCESSFUL);
+        if (request.getEvent().equals(PAYSTACK_SUCCESS) || request.getEvent().equals(MONNIFY_SUCCESS)) {
+            Transaction transaction = transactionService.updateTransaction(request.getData().getReference(), Status.SUCCESSFUL);
             Account account = transaction.getAccount();
             account.setAccountBalance(account.getAccountBalance().add(transaction.getAmount()));
             repository.save(account);
         }else {
-            transactionService.updateTransaction(request.getReferenceId(), Status.FAILED);
+            transactionService.updateTransaction(request.getData().getReference(), Status.FAILED);
         }
     }
 
@@ -131,7 +133,7 @@ public class EasyWalletService implements WalletService {
 
     private Account findAccount(String accountNumber) throws AccountAlreadyExist {
         return repository.findByAccountNumber(accountNumber)
-                .orElseThrow(() -> new AccountAlreadyExist(ACCOUNT_EXIST));
+                .orElseThrow(() -> new AccountAlreadyExist(ACCOUNT_DOES_NOT_EXIST));
     }
 
 

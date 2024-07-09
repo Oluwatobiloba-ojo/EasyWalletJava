@@ -7,7 +7,6 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class FundWalletRequest {
-    private PayStackData data;
-    private String event;
+public class PayStackData {
+    private String reference;
 }

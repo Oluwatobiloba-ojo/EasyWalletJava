@@ -2,7 +2,6 @@ package com.example.EasyWalletApplication.services;
 
 import com.example.EasyWalletApplication.dto.request.CreateAccountRequest;
 import com.example.EasyWalletApplication.dto.request.FundWalletRequest;
-import com.example.EasyWalletApplication.dto.request.PayStackFundWalletRequest;
 import com.example.EasyWalletApplication.dto.request.PerformTransactionRequest;
 import com.example.EasyWalletApplication.dto.response.CreateWalletResponse;
 import com.example.EasyWalletApplication.dto.response.PerformTransactionResponse;

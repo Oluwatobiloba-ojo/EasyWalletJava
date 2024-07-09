@@ -1,6 +1,5 @@
 package com.example.EasyWalletApplication.dto.request;
 
-import com.example.EasyWalletApplication.dto.request.MonnifyData;
 import lombok.Getter;
 import lombok.Setter;
 

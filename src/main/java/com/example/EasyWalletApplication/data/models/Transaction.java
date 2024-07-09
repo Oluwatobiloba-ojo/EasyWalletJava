@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -20,4 +21,5 @@ public class Transaction {
     private String recipient_name;
     @Enumerated(EnumType.STRING)
     private Status status = Status.PROCESSING;
+    private LocalDateTime createdAt = LocalDateTime.now();
 }

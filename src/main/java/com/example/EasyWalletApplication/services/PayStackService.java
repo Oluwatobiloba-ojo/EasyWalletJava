@@ -5,11 +5,10 @@ import com.example.EasyWalletApplication.dto.request.InitializePayment;
 import com.example.EasyWalletApplication.dto.response.InitializePaymentResponse;
 import com.example.EasyWalletApplication.dto.response.PaystackResponse;
 import com.example.EasyWalletApplication.util.External;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 @Service
 public class PayStackService implements PaymentService{
@@ -19,7 +18,7 @@ public class PayStackService implements PaymentService{
     @Override
     public InitializePaymentResponse initializeTransaction(InitializePayment<?> request) {
         InitializePaymentResponse initializePaymentResponse = new InitializePaymentResponse();
-        String key = "Bearer " + beanConfig.payStackSecretKey;
+        String key = "Bearer " + beanConfig.getPayStackSecretKey();
         ResponseEntity<PaystackResponse> response = External.makeCall(key, request.getData(), beanConfig.getPayStackUrl(), PaystackResponse.class);
         if (response.getStatusCode() != HttpStatus.OK || response.getBody() == null){
             initializePaymentResponse.setStatus(false);

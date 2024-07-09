@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 @Setter
 public class BeanConfig{
     @Value("${PAYSTACK_SECRET_KEY}")
-    public String payStackSecretKey;
+    private String payStackSecretKey;
     @Value("${PAYSTACK_INITIALIZE_TRANSACTION_URL}")
     private String payStackUrl;
     @Value("${MONIFY_CONTRACT_CODE}")

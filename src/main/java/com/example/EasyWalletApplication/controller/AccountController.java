@@ -4,13 +4,12 @@ import com.example.EasyWalletApplication.dto.request.*;
 import com.example.EasyWalletApplication.dto.response.ApiResponse;
 import com.example.EasyWalletApplication.exceptions.InvalidTransaction;
 import com.example.EasyWalletApplication.services.WalletService;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/api/v1/")
@@ -56,9 +55,25 @@ public class AccountController {
         }catch (InvalidTransaction exception){
             return ResponseEntity.badRequest().body(new ApiResponse<>(exception.getMessage(), false));
         }
-
     }
 
+    @GetMapping("transactions")
+    public ResponseEntity<ApiResponse<?>> getAllTransactions(@RequestParam("accountNumber") String accountNumber, @RequestParam("pin") String pin){
+        try{
+            return ResponseEntity.ok(new ApiResponse<>(walletService.findAllTrasanctions(accountNumber, pin), true));
+        }catch (Exception exception){
+             return ResponseEntity.badRequest().body(new ApiResponse<>(exception.getMessage(), false));
+        }
+    }
+
+    @GetMapping("account")
+    private ResponseEntity<ApiResponse<?>> getAccount(@RequestParam("accountNumber") String accountNumber, @RequestParam("pin") String pin){
+        try {
+            return ResponseEntity.ok(new ApiResponse<>(walletService.getProfile(accountNumber, pin), true));
+        }catch (Exception exception){
+            return ResponseEntity.badRequest().body(new ApiResponse<>(exception.getMessage(), false));
+        }
+    }
 
 }
 

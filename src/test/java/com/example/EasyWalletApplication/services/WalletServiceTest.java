@@ -5,6 +5,7 @@ import com.example.EasyWalletApplication.dto.response.CreateWalletResponse;
 import com.example.EasyWalletApplication.dto.response.PerformTransactionResponse;
 import com.example.EasyWalletApplication.dto.response.ProfileResponse;
 import com.example.EasyWalletApplication.exceptions.AccountAlreadyExist;
+import com.example.EasyWalletApplication.exceptions.AuthorizationException;
 import com.example.EasyWalletApplication.exceptions.InvalidTransaction;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,7 +77,7 @@ public class WalletServiceTest {
     }
 
     @Test
-    public void testThatAccountBeenCreatedAProfileIsCreatedForSuchPerson() throws AccountAlreadyExist {
+    public void testThatAccountBeenCreatedAProfileIsCreatedForSuchPerson() throws AccountAlreadyExist, AuthorizationException {
         CreateAccountRequest request = new CreateAccountRequest();
         request.setEmail("ojot630@gmail.com");
         request.setFirstName("olawale");
@@ -86,7 +87,7 @@ public class WalletServiceTest {
         CreateWalletResponse response = walletService.createAccount(request);
         assertThat(response).isNotNull();
         assertThat(response.getAccountNumber()).isEqualTo(request.getPhoneNumber());
-        ProfileResponse profileResponse = walletService.getProfile(response.getAccountNumber());
+        ProfileResponse profileResponse = walletService.getProfile(response.getAccountNumber(), request.getPin());
         assertThat(profileResponse).isNotNull();
         assertThat(profileResponse.getEmail()).isEqualTo(request.getEmail());
         assertThat(profileResponse.getPhoneNumber()).isEqualTo(request.getPhoneNumber());
@@ -111,15 +112,15 @@ public class WalletServiceTest {
 
     @Test
     @Sql("/script/insert.sql")
-    public void testThatATransactionCanBeUpdatedAndAlsoTheAccountBalanceCanBeUpdatedAlsoIfSuccessful() throws AccountAlreadyExist, InvalidTransaction {
-        ProfileResponse profileResponse = walletService.getProfile("08032389457");
+    public void testThatATransactionCanBeUpdatedAndAlsoTheAccountBalanceCanBeUpdatedAlsoIfSuccessful() throws AccountAlreadyExist, InvalidTransaction, AuthorizationException {
+        ProfileResponse profileResponse = walletService.getProfile("08032389457", "1234");
         PayStackFundWalletRequest request = new PayStackFundWalletRequest();
         PayStackData data = new PayStackData();
         data.setReference("e558ab7c-d536-45ac-9209-7c5b43cded7c");
         request.setData(data);
         request.setEvent("charge.success");
         walletService.fundWallet(new FundWalletRequest(request));
-        assertThat(walletService.getProfile("08032389457").getAmount()).isGreaterThan(profileResponse.getAmount());
+        assertThat(walletService.getProfile("08032389457", "1234").getAmount()).isGreaterThan(profileResponse.getAmount());
     }
 
 

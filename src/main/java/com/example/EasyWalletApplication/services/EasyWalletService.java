@@ -9,6 +9,7 @@ import com.example.EasyWalletApplication.data.repositories.WalletAccountReposito
 import com.example.EasyWalletApplication.dto.request.*;
 import com.example.EasyWalletApplication.dto.response.*;
 import com.example.EasyWalletApplication.exceptions.AccountAlreadyExist;
+import com.example.EasyWalletApplication.exceptions.AuthorizationException;
 import com.example.EasyWalletApplication.exceptions.InvalidTransaction;
 import com.example.EasyWalletApplication.util.ApiUtil;
 import org.modelmapper.ModelMapper;
@@ -70,8 +71,9 @@ public class EasyWalletService implements WalletService {
     }
 
     @Override
-    public ProfileResponse getProfile(String accountNumber) throws AccountAlreadyExist {
+    public ProfileResponse getProfile(String accountNumber, String pin) throws AccountAlreadyExist, AuthorizationException {
         Account account = findAccount(accountNumber);
+        if (!account.getPin().equals(pin)) throw new AuthorizationException(AUTHORIZATION_MESSAGE);
         return new ProfileResponse(account);
     }
 
@@ -119,6 +121,13 @@ public class EasyWalletService implements WalletService {
         }else {
             transactionService.updateTransaction(request.getReference(), Status.FAILED);
         }
+    }
+
+    @Override
+    public List<TransactionResponse> findAllTrasanctions(String accountNumber, String pin) throws AccountAlreadyExist, AuthorizationException {
+        Account account = findAccount(accountNumber);
+        if (!account.getPin().equals(pin)) throw new AuthorizationException(AUTHORIZATION_MESSAGE);
+        return transactionService.findAllTransactionByAccount(account);
     }
 
     private MonnifyInitializePayment createMonnifyRequest(PerformTransactionRequest request, String name, String email, String reference) {

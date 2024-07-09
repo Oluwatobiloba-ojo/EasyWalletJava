@@ -1,13 +1,18 @@
 package com.example.EasyWalletApplication.services;
 
+import com.example.EasyWalletApplication.data.models.Account;
 import com.example.EasyWalletApplication.data.models.Status;
 import com.example.EasyWalletApplication.data.models.Transaction;
 import com.example.EasyWalletApplication.data.repositories.TransactionRepository;
 import com.example.EasyWalletApplication.dto.request.CreateTransactionRequest;
 import com.example.EasyWalletApplication.dto.response.CreateTransactionResponse;
+import com.example.EasyWalletApplication.dto.response.TransactionResponse;
 import com.example.EasyWalletApplication.exceptions.InvalidTransaction;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 import static com.example.EasyWalletApplication.util.ApiUtil.TRANSACTION_DOES_NOT_EXIST;
 
@@ -15,6 +20,8 @@ import static com.example.EasyWalletApplication.util.ApiUtil.TRANSACTION_DOES_NO
 public class EasyWalletTransactionService implements TransactionService{
     @Autowired
     private TransactionRepository transactionRepository;
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     public CreateTransactionResponse createTransaction(CreateTransactionRequest request) {
@@ -40,5 +47,13 @@ public class EasyWalletTransactionService implements TransactionService{
         Transaction transaction = findTransactionById(referenceId);
         transaction.setStatus(status);
         return transactionRepository.save(transaction);
+    }
+
+    @Override
+    public List<TransactionResponse> findAllTransactionByAccount(Account account) {
+        return transactionRepository.findAllByAccount(account)
+                .stream()
+                .map(TransactionResponse::new)
+                .toList();
     }
 }

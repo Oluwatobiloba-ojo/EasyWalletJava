@@ -1,6 +1,6 @@
-FROM maven:3.8.5-openjdk-19 AS build
-COPY ../.. .
-RUN mvn clean package -DskipTests
+FROM maven:3.8.7-openjdk-17 AS build
+COPY . .
+RUN mvn -B clean package -DskipTest
 
 FROM openjdk:19
 COPY --from=build ./target/*.jar EasyWalletApplication.jar

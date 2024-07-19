@@ -1,4 +1,4 @@
-FROM maven:3.8.7 as build
+FROM maven:3.8.7-openjdk-20 AS build
 COPY . .
 RUN mvn -B clean package -DskipTests
 

@@ -4,7 +4,6 @@ import com.example.EasyWalletApplication.dto.request.*;
 import com.example.EasyWalletApplication.dto.response.ApiResponse;
 import com.example.EasyWalletApplication.exceptions.InvalidTransaction;
 import com.example.EasyWalletApplication.services.WalletService;
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +16,10 @@ public class AccountController {
 
     @Autowired
     private WalletService walletService;
-
+    @GetMapping
+    public ResponseEntity<String> wakeUp(){
+        return ResponseEntity.accepted().body("It is awake");
+    }
 
     @PostMapping("user")
     public ResponseEntity<ApiResponse<?>> createAccount(@RequestBody CreateAccountRequest request){
